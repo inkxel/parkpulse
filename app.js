@@ -131,19 +131,25 @@ function searchAddress() {
   if (!address) return;
   statusPanel.textContent = "Looking up address...";
 
+  // Note: the US Census Geocoder (free, no key) was tried first, but it doesn't send
+  // CORS headers, so a browser fetch is blocked outright — confirmed by testing it
+  // directly, not assumed. Nominatim (OSM) does support CORS from a browser context
+  // and was verified working the same way. Keep this if a nicer/quota-friendlier
+  // option is needed later — see SPEC.md for the "no OSM dependency for regulation
+  // data" rule, which doesn't apply here since this is geocoding, not rule data.
   const url =
-    "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress" +
-    `?address=${encodeURIComponent(address)}&benchmark=Public_AR_Current&format=json`;
+    "https://nominatim.openstreetmap.org/search" +
+    `?q=${encodeURIComponent(address)}&format=json&limit=1`;
 
   fetch(url)
     .then((r) => r.json())
     .then((data) => {
-      const matches = data.result?.addressMatches;
-      if (!matches || matches.length === 0) {
+      if (!data || data.length === 0) {
         statusPanel.textContent = "No match found for that address.";
         return;
       }
-      const { x, y } = matches[0].coordinates;
+      const x = parseFloat(data[0].lon);
+      const y = parseFloat(data[0].lat);
       const point = turf.point([x, y]);
 
       map.setView([y, x], 16);

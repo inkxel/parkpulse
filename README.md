@@ -13,12 +13,13 @@ python3 -m http.server 8000            # serve the static site
 
 Then open `http://localhost:8000`. Search an LA address or click a colored zone on the map — green (clear), amber (sweeping starts within 2 hours), red (restricted now). Colors are computed from the real posted schedule against the current time, not hardcoded.
 
+**Verified working in a real browser (2026-07-06, via Playwright):** map renders with all 864 real zones colored correctly, clicking a zone shows its actual route/day/time/status, address search geocodes and finds the right zone (or honestly reports no coverage there). One real bug caught and fixed in the process: the US Census Geocoder doesn't send CORS headers, so it silently failed on every browser-based search — confirmed by testing the actual fetch, not assumed. Swapped to Nominatim (OSM), confirmed working the same way.
+
 **What this slice is, honestly:**
 - One city (LA), one category (sweeping) — meters, permits, crime, and every other city are still just spec, not built. See SPEC.md → Next steps for what's next.
 - No national boundary/coverage-registry map yet — that's still the actual v1 milestone per SPEC.md, deliberately deferred so this first slice could ship fast and prove the core mechanic (adapter → schema → live status) end to end.
 - Data sync is a manual script run (`fetch_la_sweeping.py`), not yet a scheduled job — see SPEC.md's Data pipeline section for the intended automated version.
-- ~7 of LA's 871 posted routes ("Downtown"-type, weekly cadence instead of biweekly) aren't parsed yet — noted in the adapter script, not silently dropped.
-- The core logic (status computation, live Census address geocoding, point-in-polygon zone matching) was tested directly against real data and real external APIs — but the actual in-browser rendering (map tiles, click interactions, page layout) hasn't been visually verified yet, since no browser was available in the environment this was built in. Worth a real look before calling it done.
+- ~7 of LA's 871 posted routes ("Downtown"-type, weekly cadence instead of biweekly) aren't parsed yet — noted in the adapter script, not silently dropped. This is also why a Civic Center/Downtown address correctly shows "no coverage" rather than a wrong result.
 
 ## Get involved
 

@@ -160,7 +160,7 @@ Plain-English version of how everything in `research/` actually becomes somethin
 - [ ] When designing the common schema (below), make sure "this category doesn't meaningfully apply here" (e.g. sweeping in most Sunbelt cities) is representable distinctly from "no data yet"
 
 **After the slice exists, roughly in this order:**
-- [ ] Verify the v0 slice actually renders and works in a real browser (map tiles, click interactions, layout) — built and logic-tested outside a browser, never visually confirmed
+- [x] ~~Verify the v0 slice actually renders and works in a real browser~~ — **done (2026-07-06), via Playwright.** Map, zone coloring, click interactions, and address search all confirmed working against the real page. Found and fixed one real bug in the process: the Census Geocoder doesn't support CORS, so browser-based address search failed outright — swapped to Nominatim, confirmed working.
 - [ ] Build the national boundary/coverage-registry layer — the one piece of the original thin-slice plan deferred to ship the core mechanic faster; make LA visibly "supported" against a real gray national map, not just the only thing on it
 - [ ] Design the coverage registry schema (per-jurisdiction status + per-category granularity + population, so a contributor-facing "most-needed" view can sort by population × missing coverage)
 - [ ] Design the common schema with explicit per-category nullability and a "data as of" timestamp per category — and geometry-shape tolerance (LA's routes are polygons, SF's blocks are line segments; the schema needs to handle both, not assume one)
