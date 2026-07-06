@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chalked</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --green: #2e7d32;
+    --amber: #d99e00;
+    --red: #c62828;
+    --ink: #1c1c1c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, system-ui, sans-serif; color: var(--ink); }
+  header { padding: 0.75rem 1rem; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  header h1 { font-size: 1.1rem; margin: 0; }
+  header p { margin: 0; font-size: 0.8rem; color: #666; }
+  #search { flex: 1; min-width: 200px; display: flex; gap: 0.5rem; }
+  #search input { flex: 1; padding: 0.4rem 0.6rem; font-size: 0.9rem; }
+  #search button { padding: 0.4rem 0.8rem; }
+  #map { height: calc(100vh - 130px); width: 100%; }
+  #status-panel { padding: 0.6rem 1rem; font-size: 0.85rem; border-top: 1px solid #ddd; min-height: 1.4rem; }
+  .dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; margin-right: 0.4rem; vertical-align: middle; }
+  .dot.green { background: var(--green); }
+  .dot.amber { background: var(--amber); }
+  .dot.red { background: var(--red); }
+  #disclaimer { padding: 0.4rem 1rem; font-size: 0.72rem; color: #888; background: #fafafa; border-top: 1px solid #eee; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Chalked</h1>
+    <p>Los Angeles street sweeping — thin slice, one city, one category</p>
+  </div>
+  <div id="search">
+    <input id="address-input" type="text" placeholder="Enter an LA address..." />
+    <button id="search-btn">Check</button>
+  </div>
+</header>
+<div id="map"></div>
+<div id="status-panel">Click a zone on the map, or search an address, to see its sweeping status.</div>
+<div id="disclaimer">Informational only, not responsible for citations or towing. Always defer to posted physical signage over anything shown here. Data source: LADOT, synced manually for now — see SPEC.md.</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

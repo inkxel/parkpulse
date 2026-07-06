@@ -2,7 +2,23 @@
 
 Drop a pin or enter an address, get the full read on street parking there: street sweeping schedule, time limits, meters (and whether they're free on weekends/evenings), and permit-parking zone status. (A break-in/vehicle-crime-risk layer is a paused, open question — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/chalked/discussions/1) — not something we're shipping without real input first.)
 
-**Status: spec stage, research-informed.** No national data standard exists for this — every city publishes (or doesn't publish) its own parking data differently. The map itself will be national from day one (US Census boundaries, always complete); actual parking-rule coverage grows jurisdiction by jurisdiction, shown honestly — supported areas in full color, everywhere else grayed out with a link to help add it. See [SPEC.md](SPEC.md) for the full data landscape and architecture.
+**Status: first working slice, LA sweeping only.** No national data standard exists for this — every city publishes (or doesn't publish) its own parking data differently. The full plan is a national map from day one (US Census boundaries), with real coverage growing jurisdiction by jurisdiction — this first slice validates the core pipeline (real source → common schema → live status) on one city and one category before building that out. See [SPEC.md](SPEC.md) for the full data landscape and architecture.
+
+## Running the v0 slice locally
+
+```
+python3 scripts/fetch_la_sweeping.py   # re-fetch LA's sweeping data from LADOT (manual for now)
+python3 -m http.server 8000            # serve the static site
+```
+
+Then open `http://localhost:8000`. Search an LA address or click a colored zone on the map — green (clear), amber (sweeping starts within 2 hours), red (restricted now). Colors are computed from the real posted schedule against the current time, not hardcoded.
+
+**What this slice is, honestly:**
+- One city (LA), one category (sweeping) — meters, permits, crime, and every other city are still just spec, not built. See SPEC.md → Next steps for what's next.
+- No national boundary/coverage-registry map yet — that's still the actual v1 milestone per SPEC.md, deliberately deferred so this first slice could ship fast and prove the core mechanic (adapter → schema → live status) end to end.
+- Data sync is a manual script run (`fetch_la_sweeping.py`), not yet a scheduled job — see SPEC.md's Data pipeline section for the intended automated version.
+- ~7 of LA's 871 posted routes ("Downtown"-type, weekly cadence instead of biweekly) aren't parsed yet — noted in the adapter script, not silently dropped.
+- The core logic (status computation, live Census address geocoding, point-in-polygon zone matching) was tested directly against real data and real external APIs — but the actual in-browser rendering (map tiles, click interactions, page layout) hasn't been visually verified yet, since no browser was available in the environment this was built in. Worth a real look before calling it done.
 
 ## Get involved
 

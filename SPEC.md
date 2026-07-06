@@ -151,8 +151,8 @@ Plain-English version of how everything in `research/` actually becomes somethin
 
 **Immediate:**
 1. [x] ~~Check whether LA's actual CDS feed covers sweeping/permit data~~ — **done (2026-07-06): confirmed no.** CDS is scoped to downtown loading-zone pilots in LA/Seattle/DC, no open public feed either way. The ArcGIS approach already found is the confirmed path. See [research/national-vendor-landscape.md](research/national-vendor-landscape.md).
-2. [ ] Cross-check LA's possible second sweeping source (Socrata `krk7-ayq2`) against the ArcGIS Feature Service already confirmed — same data two ways, or genuinely separate?
-3. [ ] Build the thin vertical slice (see Data pipeline, above): national boundary layer with LA marked supported and everywhere else gray, one real LA sweeping adapter, basic address/pin lookup, sweeping's green/amber/red status only. Nothing else blocks on this — it validates the whole shape end to end.
+2. [x] ~~Cross-check LA's possible second sweeping source (Socrata `krk7-ayq2`)~~ — **done (2026-07-06): genuinely different, less complete.** Has route number/council district/time window/text boundary description, but no day-of-week field and no polygon geometry — can't drive the map or the day/week recurrence logic on its own. The ArcGIS Feature Service remains the primary source; this one isn't worth merging in for now.
+3. [x] ~~Build the thin vertical slice~~ — **done (2026-07-06), partially.** Built: real LA sweeping adapter (`scripts/fetch_la_sweeping.py`, LADOT ArcGIS → common schema), address/pin lookup (Census Geocoder + turf.js point-in-polygon), sweeping's green/amber/red status computed live against real posted schedules. Core logic (status computation, geocoding, polygon matching) verified against real data outside a browser — actual visual rendering not yet confirmed, no browser available in the build environment. **Not yet built:** the national boundary/coverage-registry layer (still just LA on the map, not "LA supported, everywhere else gray") — deferred deliberately to ship the core mechanic first; see README → "Running the v0 slice locally" for the full honest scope.
 
 **From the 29-city broad scan (2026-07-06, see [research/city-hub-scan.md](research/city-hub-scan.md)):**
 - [ ] Investigate ParkUsher directly (architecture, open-source status, data sourcing) — the closest prior-art analog to CURB/sweep.la found anywhere, covering Boston/NYC/Seattle/SF and others
@@ -160,6 +160,8 @@ Plain-English version of how everything in `research/` actually becomes somethin
 - [ ] When designing the common schema (below), make sure "this category doesn't meaningfully apply here" (e.g. sweeping in most Sunbelt cities) is representable distinctly from "no data yet"
 
 **After the slice exists, roughly in this order:**
+- [ ] Verify the v0 slice actually renders and works in a real browser (map tiles, click interactions, layout) — built and logic-tested outside a browser, never visually confirmed
+- [ ] Build the national boundary/coverage-registry layer — the one piece of the original thin-slice plan deferred to ship the core mechanic faster; make LA visibly "supported" against a real gray national map, not just the only thing on it
 - [ ] Design the coverage registry schema (per-jurisdiction status + per-category granularity + population, so a contributor-facing "most-needed" view can sort by population × missing coverage)
 - [ ] Design the common schema with explicit per-category nullability and a "data as of" timestamp per category — and geometry-shape tolerance (LA's routes are polygons, SF's blocks are line segments; the schema needs to handle both, not assume one)
 - [ ] Design the per-category confidence/staleness UI (not just the backend timestamp)
