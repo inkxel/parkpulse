@@ -137,9 +137,12 @@ function searchAddress() {
   // and was verified working the same way. Keep this if a nicer/quota-friendlier
   // option is needed later — see SPEC.md for the "no OSM dependency for regulation
   // data" rule, which doesn't apply here since this is geocoding, not rule data.
+  // countrycodes=us matters, not just tidiness: a bare 5-digit ZIP like "90018" is
+  // globally ambiguous (Italy uses the same format) and resolves to the wrong
+  // country without it — found by actually testing a ZIP-only search, not assumed.
   const url =
     "https://nominatim.openstreetmap.org/search" +
-    `?q=${encodeURIComponent(address)}&format=json&limit=1`;
+    `?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=us`;
 
   fetch(url)
     .then((r) => r.json())
