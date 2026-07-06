@@ -14,15 +14,32 @@ That's exactly why verification matters *more* here, not less. Treat everything 
 
 Most of what belongs in this folder is genuinely light work: does a dataset exist, what's its schema, is it fresh. That doesn't need a large or expensive model — a small, fast, even locally-run one is usually enough to check a data portal, read a page, or classify whether a document mentions parking permits. Save more capable reasoning for the parts that actually need judgment: reconciling contradictory findings, deciding what something implies for the architecture, writing the synthesis. Match the tool to the task — it's cheaper, it's faster, and it's the more honest way to spend the compute this kind of work should actually cost.
 
+## Structure
+
+```
+research/
+  cities/<city>.md     — everything found for one city: every category, prior art, decisions
+  states/<state>.md     — index of that state's researched cities, plus genuinely state-level
+                          findings if any turn up (statewide statutes, DMV data, etc.)
+  <topic>.md            — cross-cutting methods and landscape research that isn't about any
+                          one city or state (loose at the folder root — there are only a
+                          handful of these and they don't proliferate the way cities/states do)
+```
+
+**Where something goes:** if a finding is about one specific city, it goes in that city's file — don't split a city across multiple files by category (sweeping vs. permits, etc.), and don't create a new file for a city that already has one. If it's a genuine state-level fact (not just "here's a list of this state's cities"), it goes in that state's file. If it applies across many cities/states — a technique, a vendor, a national standard — it's cross-cutting and belongs as its own topic file at the folder root, not folded into whichever city happened to surface it.
+
+Every city file should be linked from its state's file, and every state file should be linked from this index below.
+
 ## Index
 
-One file per city, covering everything found for that city (all categories, prior art, decisions). A separate small set of files for findings that genuinely aren't about one city — methods and cross-city landscape research — kept apart rather than force-fit into a jurisdiction that doesn't own them.
+**States**
+- [California](states/california.md) — Los Angeles, San Francisco
 
 **Cities**
-- [Los Angeles](los-angeles.md) — sweeping, permits, meters, crime, sweep.la regional context
-- [San Francisco](san-francisco.md) — CURB, SF's own data sources, why no ParkPulse adapter here
+- [Los Angeles](cities/los-angeles.md) — sweeping, permits, meters, crime, sweep.la regional context
+- [San Francisco](cities/san-francisco.md) — CURB, SF's own data sources, why no ParkPulse adapter here
 
-*(Chicago, NYC, Seattle, DC have entries in the README's coverage table and their own jurisdiction issues, but no dedicated research file yet — they'll get one once someone researches them past the summary level.)*
+*(Chicago, NYC, Seattle, DC have entries in the README's coverage table and their own jurisdiction issues, but no dedicated research file yet — they'll get one, and their state gets an index page, once someone researches them past the summary level.)*
 
 **Methods & cross-city landscape**
 - [Dashboard-tracing method](dashboard-tracing-method.md) — how to find real data hiding behind a public-facing ArcGIS dashboard

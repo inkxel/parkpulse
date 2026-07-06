@@ -13,6 +13,6 @@
 - LA's street sweeping dashboard → `Posted_Street_Sweeping_Routes_Update` FeatureServer
 - LA's Preferential Parking Districts dashboard → `LADOT_PPD` FeatureServer
 
-Both documented in full in [Los Angeles](los-angeles.md).
+Both documented in full in [Los Angeles](cities/los-angeles.md).
 
 **Where to apply this next:** any jurisdiction marked "unconfirmed" or "gap" in the coverage list — that status may just mean nobody's traced the dashboard yet, not that the data doesn't exist. Chicago and Seattle's sweeping-schedule gaps are the most likely next candidates for this to overturn, given LA's own gap turned out to be wrong twice.
