@@ -55,36 +55,60 @@ Tucker found LA's public sweeping lookup (streets.lacity.gov) and an ArcGIS dash
 
 **LA is back in as a candidate**, now 3-of-4 (sweeping ✅, meters ✅ best-documented anywhere, crime ✅, permits ❌ no confirmed dataset — LA doesn't lean on residential permit parking the way SF/DC/Chicago do). No CURB-equivalent found for LA specifically — worth a dedicated check before committing, per the CURB lesson above.
 
+### sweep.la — a second real precedent, and it's already multi-city
+Tucker found this too. **sweep.la** ("Sweep LA") covers not just the city of LA but **5 separate municipalities**: Los Angeles, Santa Monica, Glendale, West Hollywood, and Pasadena — each running its own independent sweeping program, aggregated into one lookup. Multilingual (en/es/ko/ru/tl), PWA, "as-is, not affiliated with the City of Los Angeles." No GitHub link found on the site — not confirmed open source, unlike CURB.
+
+Real signal: crossing city boundaries is already happening at solo/small-team scale in this exact space. Two independent single-city-metro tools (CURB, sweep.la) both exist and both work. The gap they leave — nationwide reach, open source, and the crime-risk overlay — is still wide open.
+
+## Architecture reframe (2026-07-05): national map shell from day one, not sequential launch cities
+
+Tucker's proposal, and it holds up: instead of picking cities to launch in sequence, build a **full national map on day one**, with per-region coverage status shown honestly — the way Zillow/Redfin show a nationwide map with "estimate not available" or grayed states for low-data areas rather than only showing markets they've fully built out. Unsupported regions get a visible "not covered yet — help us add this" link to the repo's contribution guide.
+
+**Why this is buildable, not just a nice idea:** the hard, patchy part is the parking-*regulation* data — but the part needed to show a national map at all (knowing what jurisdiction any point falls in, and drawing city/county boundaries) is a **solved, complete, free, uniform national dataset already**: US Census **TIGER/Line** (or Cartographic Boundary) files cover every incorporated place and county in the country, no fragmentation, no per-city integration needed. The shell doesn't wait on data coverage — only the content *inside* each jurisdiction does.
+
+**What this changes:**
+- **No more "pick a launch city" debate.** Every place is on the map from day one with an honest status. Which jurisdiction gets a real adapter next becomes community-driven — whoever cares enough to contribute one — not something Tucker has to rank and decide alone.
+- **Coverage becomes the primary growth loop, not a launch strategy.** Someone searches their own address, sees "not supported yet," and gets routed straight to "here's how to add it" — the highest-intent moment to recruit a contributor, the same pattern OpenStreetMap and Wikipedia both lean on.
+- **A coverage registry is now a first-class data structure**, not an afterthought: per jurisdiction, a status (`supported` / `unsupported`, maybe `in-progress`), and which categories (sweeping/meters/permits/crime) that jurisdiction actually has built, since partial coverage (e.g. Chicago minus meters) is the normal case, not an edge case.
+- **The per-city adapter work (LA, Chicago, etc. — see below) becomes the first contributions**, proving out the adapter interface and the CONTRIBUTING guide, rather than "the v1 launch." Tucker building the first one or two is what makes the "help us add yours" ask credible.
+
 ## Architecture (draft)
-Given the "every city is its own integration" finding, the shape is a **pluggable per-city adapter behind a common schema** — CurbLR's original intent, just DIY'd rather than waiting on city-side adoption of a standard that stalled.
+Given the "every city is its own integration" finding plus the national-shell reframe above, the shape is: **a national map + coverage registry that exists independent of data, with pluggable per-jurisdiction adapters behind a common schema** — CurbLR's original intent, DIY'd, wrapped in a Zillow/Redfin-style coverage map instead of waiting on city-side adoption of a standard that stalled.
 
-- **Common schema** — one normalized representation for sweeping schedule, meter rules (including free periods), permit-zone status, and crime-risk overlay, with every field nullable per category (a city missing meters data, e.g. Chicago, should degrade gracefully, not break the schema).
-- **Per-city adapter** — one ingestion module per city, each mapping that city's actual open-data quirks (Socrata vs. ArcGIS, different field names, different update cadences) into the common schema. This is most of the real engineering work, and it's inherently unglamorous, ongoing maintenance — city portals change schemas without warning.
-- **Crime-risk layer** — separate from the regulation data proper; filters each city's broad crime-code taxonomy down to vehicle-break-in-relevant categories, then aggregates to a density/risk signal (not raw incident pins — avoids the product feeling like a crime map).
-- **Lookup** — address/pin in, geocode to the right city + block, query that city's adapter output, return the combined read.
-- **No OSM dependency for regulation data** — OSM (if used at all) is a basemap layer only, per the finding above.
+- **National base layer** — US Census TIGER/Line (or Cartographic Boundary) files for every incorporated place + county. Solved, uniform, complete, no per-city work required. This is what makes the map itself national on day one.
+- **Coverage registry** — per jurisdiction: `supported` / `unsupported` (/ `in-progress`), plus which categories (sweeping/meters/permits/crime) are actually built for it. Partial coverage is the normal case, not an edge case — the registry needs to represent "Chicago minus meters," not just a binary yes/no.
+- **Common schema** — one normalized representation for sweeping schedule, meter rules (including free periods), permit-zone status, and crime-risk overlay, with every field nullable per category.
+- **Per-jurisdiction adapter** — one ingestion module per city/county, each mapping that place's actual open-data quirks (Socrata vs. ArcGIS, different field names, different update cadences — including tracing hidden ArcGIS dashboards back to their feature services, per the LA finding) into the common schema. This is most of the real engineering work, ongoing maintenance — portals change schemas without warning — and, going forward, the thing community contributors do.
+- **Crime-risk layer** — separate from the regulation data proper; filters each jurisdiction's broad crime-code taxonomy down to vehicle-break-in-relevant categories, then aggregates to a density/risk signal (not raw incident pins — avoids the product feeling like a crime map).
+- **Lookup** — address/pin in, resolve jurisdiction via the national base layer, check the coverage registry, either return the combined read (supported) or show the honest "not yet covered — help us add it" state linking to the contribution guide (unsupported).
+- **No OSM dependency for regulation data** — OSM (if used at all) is a basemap layer only, per the earlier finding.
 
-## Launch cities (candidates, not final)
-**San Francisco removed as launch candidate** (2026-07-05) — CURB (curb.guide) already covers it exceptionally well, open source, actively maintained. Rebuilding it would be pure duplication. ParkPulse either skips SF entirely (link out to CURB for SF users) or, if included later, treats CURB's dataset/approach as a reference adapter rather than building one from scratch.
+## First adapters to build (not "launch cities" — the map covers everywhere from day one)
+These are the first few jurisdictions worth building real adapters for, to prove the schema and seed the coverage map with real data — not a sequential rollout plan, since every place is already visible on the national map regardless.
 
-Ranked by combined open-data coverage among cities with no comparable existing tool, each with its known gap. **Re-check "unconfirmed" gaps via the dashboard-tracing method (above) before trusting them** — LA's sweeping gap turned out to be wrong when actually checked.
-1. **Chicago** — strong on sweeping/permits/crime; meters is the one real hole (private concessionaire, no open API — would need a scraper or an explicit "meters unknown here" state). No CURB-equivalent found for Chicago — genuine open territory, but re-check before committing.
-2. **Los Angeles** — sweeping confirmed open 2026-07-05 (see correction above), meters best-documented anywhere, crime open; permits is the one real gap (no confirmed dataset, and LA doesn't lean on residential permit parking the way SF/DC/Chicago do). No CURB-equivalent found — worth a dedicated check.
+**San Francisco is deliberately not one of them** (2026-07-05) — CURB (curb.guide) already covers it exceptionally well, open source, actively maintained. Rebuilding it would be pure duplication; ParkPulse either shows SF as covered-by-a-linked-external-tool, or treats CURB's approach as a reference adapter rather than building one from scratch.
+
+Ranked by combined open-data coverage among jurisdictions with no comparable existing tool, each with its known gap. **Re-check "unconfirmed" gaps via the dashboard-tracing method (above) before trusting them** — LA's sweeping gap turned out to be wrong when actually checked.
+1. **Chicago** — strong on sweeping/permits/crime; meters is the one real hole (private concessionaire, no open API — would need a scraper or an explicit "meters unknown here" state). No CURB/sweep.la-equivalent found — genuine open territory, but re-check before committing.
+2. **Los Angeles** — sweeping confirmed open 2026-07-05 (see correction above), meters best-documented anywhere, crime open; permits is the one real gap. sweep.la already covers LA + 4 neighbors (not confirmed open source) — worth checking whether that changes LA's priority here.
 3. **Seattle** — strong on meters/permits/crime; sweeping schedule not yet confirmed open — but given the LA miss, worth checking for a hidden ArcGIS dashboard before concluding it's actually absent.
 4. **NYC** — richest regulation + meter data of any city, but no permit-zone model to speak of — different rule shape entirely (alternate-side parking, not sweeping).
 5. **Washington DC** — solid permits + crime, but an entirely different seasonal-rule regime (snow/leaf season, no sweeping program).
 
 ## Open questions
-- **Before picking a first city, re-check for a CURB-equivalent there specifically.** CURB's existence (found by Tucker directly, missed by the initial research pass since it's <1 month old) means "no prior art found" can't be trusted without a fresh, dedicated check per candidate city — search indexes lag new repos.
-- Should ParkPulse cover SF at all, even as a thin adapter crediting/linking to CURB, or skip it entirely and stay out of an already-well-served city?
-- How to handle the "meters unknown" / "sweeping unknown" gaps in the UI honestly, without the product reading as unreliable where data just doesn't exist yet.
-- Crime-risk overlay: what aggregation (density heatmap? per-block score?) avoids the product feeling alarmist or crime-map-flavored while still being useful. This remains the one piece no prior art (including CURB) covers.
-- Whether a city's own citation data supports the GPS-matched-to-real-enforcement-time trick CURB pulled off for SF (requires the city to still publish/release citation GPS, or be willing to fulfill a public-records request the way SFMTA did) — worth checking per candidate city before committing, since it's the difference between "shows the posted schedule" and "shows when tickets actually land."
-- Update cadence and monitoring for city portal schema drift — Chicago's meter scraper precedent (community-maintained, unofficial) suggests this is a real, recurring maintenance cost, not a one-time build.
+- What does the "not covered yet" state actually look like — gray fill only, or a lighter hint of jurisdiction-level metadata (population, at least the boundary) even with zero regulation data? Zillow-style "estimate not available" implies some baseline info is still shown.
+- What does the contribution guide need to teach a newcomer to build a real adapter — at minimum, the dashboard-tracing method (above), the common schema, and a worked example (the SF or LA adapter, once built).
+- Should ParkPulse show SF at all, even as "covered — see CURB" with a link out, or leave it visually gray like anywhere else unsupported? Leaving it gray undersells that SF *is* solved, just by someone else.
+- How partial coverage displays honestly (e.g. Chicago minus meters) without reading as broken or unreliable where data just doesn't exist yet.
+- Crime-risk overlay: what aggregation (density heatmap? per-block score?) avoids the product feeling alarmist or crime-map-flavored while still being useful. This remains the one piece no prior art (CURB, sweep.la) covers.
+- Whether a jurisdiction's own citation data supports the GPS-matched-to-real-enforcement-time trick CURB pulled off for SF — worth checking per adapter before committing, since it's the difference between "shows the posted schedule" and "shows when tickets actually land."
+- Update cadence and monitoring for portal schema drift — Chicago's meter scraper precedent (community-maintained, unofficial) suggests this is a real, recurring maintenance cost, not a one-time build.
 
 ## Next steps
-- [ ] Re-check Chicago and Seattle's data gaps using the dashboard-tracing method (walk ArcGIS item → web map → operationalLayers URLs, not just search for a developer-facing open-data page) before trusting either "unconfirmed"/"gap" call
-- [ ] Re-check prior art specifically for Chicago, LA, and Seattle before committing to a launch city — don't repeat the SF miss
-- [ ] Pick the first city from the remaining candidates once both checks are done
-- [ ] Design the common schema with explicit per-category nullability from day one — and geometry-shape tolerance (LA's routes are polygons, SF's blocks are line segments; the common schema needs to handle both, not assume one)
-- [ ] Prototype the crime-risk aggregation approach — this is the piece no existing tool (including CURB) does
+- [ ] Get the national base layer working first: Census TIGER/Line boundaries on a map, every jurisdiction resolvable from a pin/address, all shown as "unsupported" — this is the actual v1 milestone, before any single adapter
+- [ ] Design the coverage registry schema (per-jurisdiction status + per-category granularity)
+- [ ] Write the CONTRIBUTING guide for adding a jurisdiction (dashboard-tracing method, common schema, worked example) — needed before asking anyone to help
+- [ ] Re-check Chicago and Seattle's data gaps using the dashboard-tracing method before trusting either "unconfirmed"/gap call
+- [ ] Build the first real adapter (Chicago or LA) to prove the schema and seed the map with real data, and to make the contribution guide's example concrete
+- [ ] Design the common schema with explicit per-category nullability — and geometry-shape tolerance (LA's routes are polygons, SF's blocks are line segments; the schema needs to handle both, not assume one)
+- [ ] Prototype the crime-risk aggregation approach — this is the piece no existing tool (including CURB, sweep.la) does
