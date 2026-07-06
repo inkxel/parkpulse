@@ -1,7 +1,7 @@
 # ParkPulse — Spec
 
 ## Concept
-Address or pin in, full street-parking picture out: street sweeping schedule, time limits, meters (including whether they're free on weekends/evenings), permit-parking zone status, and a break-in-risk overlay from public crime data.
+Address or pin in, full street-parking picture out: street sweeping schedule, time limits, meters (including whether they're free on weekends/evenings), and permit-parking zone status. A break-in/vehicle-crime-risk layer is **paused, not committed** — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/parkpulse/discussions/1) — the harm/bias risk of a naive crime overlay is real enough that it shouldn't ship without community input first.
 
 **The mission is bigger than the tool.** As much as being useful day-to-day, ParkPulse exists to make the fragmentation itself visible — every correction in this spec (LA's sweeping and permit data both existing but hidden behind undocumented ArcGIS dashboards, a decade-old "annual" dataset that was never actually refreshed) is a small, concrete demonstration of why a real national curb-data standard is overdue. This isn't just a human convenience problem anymore, either: autonomous vehicles need to know where they can and can't park, and when that data is stale or wrong, the failure shows up in the real world — see "Why this project exists" in the README.
 
@@ -107,6 +107,20 @@ When ParkPulse shows something wrong — says a block is clear when the posted s
 ### Disclaimer — heavy, upfront, non-negotiable
 The site is informational only. Not responsible for citations, towing, or any consequence of relying on it. Users must always defer to posted physical signage over anything ParkPulse shows — the same posture CURB takes ("the posted sign is always the source of truth"), and necessary here for the same reason: this is inferred/aggregated public data, not a legal guarantee. Needs to be prominent (not buried in a footer link) — a first-run notice or persistent banner, not just a ToS page nobody reads.
 
+## Beyond open data: unsigned, code-only rules (2026-07-05)
+
+**The Walnut, CA case, and why it breaks the disclaimer's safety net.** Tucker's in-laws live in Walnut, CA — the entire city requires an overnight parking permit, citywide, with **no signage anywhere** stating it. You're expected to know the rule because you're in Walnut, full stop. This isn't a GIS/open-data gap, it's a fundamentally different category: a real, binding, ticketable rule that exists **only in municipal code**, with no physical marker a driver could ever spot and no dataset a city GIS team would think to publish (there's nothing to map — it's not tied to specific blocks, it's the whole jurisdiction by default).
+
+This matters more than it might look like at first, because it's the one case where "always defer to the posted sign" — the disclaimer's whole safety net — doesn't help. There's no sign to defer to. If ParkPulse (or any tool) doesn't know about a rule like this, an out-of-town driver has no practical way to find out short of already knowing the city's code. Cities almost certainly vary a lot in how much they rely on "residents just know" vs. actual signage, and there's no reason to think Walnut is unique.
+
+**Schema implication:** the common schema needs a rule type that isn't tied to a block or zone at all — a **jurisdiction-wide default rule** (e.g. "overnight parking anywhere in city limits requires a permit, no exceptions"), layered *underneath* the block-specific sweeping/meter/permit-zone data most of this spec has been about. A city can have both at once — specific signed zones *and* an invisible blanket default — and the schema needs to represent that layering, not just one or the other.
+
+**How to actually find these, without scraping every municipal code in the country up front:**
+- **Most municipal codes aren't hosted on bespoke city websites — they're consolidated onto a handful of third-party platforms**: Municode (municode.com), American Legal Publishing (amlegal.com), General Code (ecode360.com), a few others. This is the same shape as the ArcGIS-dashboard discovery from earlier: check whether a target city's code lives on one of these platforms first, since it turns "thousands of unique city websites" into "a handful of known platforms with fairly consistent structure" — a real scalability lever, not a hopeful assumption.
+- **Don't process a full municipal code.** Most are organized with a clear parking/vehicles-and-traffic chapter — narrow to that section with a cheap search pass before any LLM reads anything. Full-document processing per city, per the model-routing discipline already used elsewhere (FOUNDRY's own Haiku/Sonnet/Opus split is the same idea): a mechanical "does this chapter mention permit parking" classification is cheap-tier work; extracting the actual rule (who/what/when/exceptions) from an already-narrowed section is a step up, but still bounded and cheap relative to reading the whole code.
+- **Let the contribution/error-reporting model do the discovery work, rather than brute-forcing every city nationally.** Tucker knew about Walnut's rule because he has in-laws there — that's exactly the kind of local knowledge the error-reporting pipeline (above) should be able to capture: "my city has an unsigned rule like X" as its own report type, which then triggers a *targeted*, cheap, single-city code lookup — not a standing, expensive effort to scrape every municipal code in the US speculatively. Scale the code-reading effort to where a human already flagged a reason to look, the same way adapter-building itself is meant to be community-driven rather than centrally planned.
+- **Cache and re-check on a cadence, not per-request.** Municipal code changes are infrequent (amendments, not daily updates) — read once, store the result, re-check occasionally, not on every lookup.
+
 ## First adapters to build (not "launch cities" — the map covers everywhere from day one)
 These are the first few jurisdictions worth building real adapters for, to prove the schema and seed the coverage map with real data — not a sequential rollout plan, since every place is already visible on the national map regardless.
 
@@ -142,7 +156,10 @@ Ranked by combined open-data coverage among jurisdictions with no comparable *op
 - [ ] Re-check Chicago and Seattle's data gaps using the dashboard-tracing method before trusting either "unconfirmed"/gap call
 - [ ] Build the first real adapter — LA is the clean pick (population + most complete data); weigh NYC seriously too despite its permit-model gap, given its outsized population and enforcement intensity
 - [ ] Design the common schema with explicit per-category nullability and a "data as of" timestamp per category — and geometry-shape tolerance (LA's routes are polygons, SF's blocks are line segments; the schema needs to handle both, not assume one)
-- [ ] Prototype the crime-risk aggregation approach — this is the piece no existing tool (including CURB, sweep.la) does
+- [ ] ~~Prototype the crime-risk aggregation approach~~ — **paused pending [Discussion #1](https://github.com/inkxel/parkpulse/discussions/1)**, not a committed build item. See [ETHICS.md](ETHICS.md).
 - [ ] Design the per-category confidence/staleness UI (not just the backend timestamp)
 - [ ] Design the error-report → GitHub Issue pipeline, including the anti-spam/moderation step before anything posts publicly
 - [ ] Write the disclaimer and decide its placement (first-run notice vs. persistent banner) before any public build ships
+- [ ] Add jurisdiction-wide default rules as a schema-level concept (distinct from block/zone-specific data) — needed for cases like Walnut, CA's unsigned citywide overnight-permit rule
+- [ ] Extend the error-report pipeline to accept "my city has an unsigned rule like X" as its own report type, feeding targeted per-city code lookups instead of blind nationwide scraping
+- [ ] Check whether each first-adapter city's municipal code is hosted on Municode/American Legal/General Code before assuming a bespoke scrape is needed
