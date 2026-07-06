@@ -80,6 +80,7 @@ if (DEBUG_TIME) {
 }
 
 const map = L.map("map").setView([34.0522, -118.2437], 11);
+window.map = map; // exposed for QA/testing (e.g. Playwright driving the map programmatically)
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
   maxZoom: 19,
@@ -95,6 +96,18 @@ function renderPanel(zone, status) {
     `<strong>${zone.route_id}</strong> (${zone.maintenance_district_name}) — ${zone.day_of_week}s, ` +
     `${zone.start_time}–${zone.end_time}, weeks ${zone.weeks_of_month.join(" & ")}, ` +
     `${zone.side_of_street} side. ${status.label}`;
+}
+
+// Meters aren't a restriction with a status level -- they're a cost fact (SPEC.md's
+// "Visual design" section: meters get their own treatment, not the green/amber/red scale).
+// No color dot here on purpose; a blue marker on the map is enough to mark "this is a meter."
+function renderMeterPanel(meter) {
+  statusPanel.innerHTML =
+    `<span class="dot blue"></span>` +
+    `<strong>Meter ${meter.space_id}</strong> — ${meter.blockface}. ` +
+    `${meter.rate_type} rate ${meter.rate}, ${meter.time_limit} limit. ` +
+    `<em>No operating-hours/schedule data available for LA meters (see research/cities/los-angeles.md) — ` +
+    `check the posted meter sign for when payment is actually required.</em>`;
 }
 
 function styleFeature(now) {
@@ -131,6 +144,52 @@ fetch("data/la-sweeping.geojson")
 
 // Keep colors honest if the page is left open across a status change.
 setInterval(refreshColors, 60_000);
+
+// Meters layer -- 34,943 individual points citywide, far too many for plain markers
+// without choking the browser. Clustered (Leaflet.markercluster), off by default so the
+// sweeping layer stays legible; toggle to load it in (fetched once, lazily).
+let metersLayer = null;
+let metersLoadPromise = null;
+
+function loadMetersLayer() {
+  if (metersLoadPromise) return metersLoadPromise;
+  metersLoadPromise = fetch("data/la-meters.geojson")
+    .then((r) => r.json())
+    .then((data) => {
+      metersLayer = L.markerClusterGroup({ disableClusteringAtZoom: 18 });
+      data.features.forEach((feature) => {
+        const [lng, lat] = feature.geometry.coordinates;
+        const marker = L.circleMarker([lat, lng], {
+          radius: 5,
+          color: "#1565c0",
+          fillColor: "#1565c0",
+          fillOpacity: 0.8,
+          weight: 1,
+        });
+        marker.on("click", () => renderMeterPanel(feature.properties));
+        metersLayer.addLayer(marker);
+      });
+      return metersLayer;
+    })
+    .catch((err) => {
+      statusPanel.textContent = "Couldn't load meters data: " + err.message;
+    });
+  return metersLoadPromise;
+}
+
+document.getElementById("layer-meters").addEventListener("change", (e) => {
+  if (e.target.checked) {
+    loadMetersLayer().then((layer) => layer && map.addLayer(layer));
+  } else if (metersLayer) {
+    map.removeLayer(metersLayer);
+  }
+});
+
+document.getElementById("layer-sweeping").addEventListener("change", (e) => {
+  if (!geoLayer) return;
+  if (e.target.checked) map.addLayer(geoLayer);
+  else map.removeLayer(geoLayer);
+});
 
 // Address search via the free US Census Geocoder — no API key, and it's the same
 // national data source (Census) already planned as the base boundary layer.

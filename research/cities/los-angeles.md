@@ -35,7 +35,11 @@ Real, queryable, MultiPolygon geometry, fields `PPDNUM` + `PPDNAME`, public doma
 
 ## Meters
 
-`LADOT Metered Parking Inventory & Policies` — `https://data.lacity.org/Transportation/LADOT-Metered-Parking-Inventory-Policies/s49e-q6j2` — the best-documented meter dataset of any city checked so far. Not yet independently deep-dived beyond confirming it's real, open, and Socrata-hosted; no staleness or schema concerns surfaced yet.
+`LADOT Metered Parking Inventory & Policies` — `https://data.lacity.org/resource/s49e-q6j2.json` — real, Socrata-hosted, **34,943 individual meter points** citywide (adapter: `scripts/fetch_la_meters.py`, built and browser-verified 2026-07-06).
+
+**Honest limitation, found by actually reading the schema, not assumed:** the dataset has `spaceid`, `blockface`, `metertype`, `ratetype`, `raterange`, `timelimit`, and a lat/lng point — but **no operating-hours or day-of-week field at all**. There's no "free on weekends" signal to show either way, in either direction — not that it's missing from Chalked, it's missing from the source. Displayed honestly: rate and time-limit as a fact, with an explicit "check the posted sign for when payment is required" note, rather than implying a schedule Chalked doesn't actually have.
+
+**Rendering note, permanently useful:** 34,943 points is far too many for plain Leaflet markers — renders but chokes interaction. Used [Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster) (clusters at city-wide zoom, resolves to individual circle markers past zoom 18) rather than a custom solution. This is the standard tool for exactly this problem; worth reaching for again whenever any city's per-point dataset (meters, individual signs) gets into the thousands.
 
 ## Crime
 
