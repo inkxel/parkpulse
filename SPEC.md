@@ -32,10 +32,21 @@ Real and geocoded in every major city checked (SF, LA, NYC, Chicago all publish 
 OSM has real tagging conventions (`parking:lane=*`, `parking:condition=*`), but coverage for on-street parking specifically is thin and inconsistent. Telling data point: **SpotAngels** (a funded commercial competitor) tried building on city open data + OSM and found both insufficient — they pivoted to a Waze-style crowdsourced model layered on an OSM basemap. If a resourced company concluded OSM tagging alone isn't reliable enough, that's a real ceiling for this project too, not a niche complaint. OSM can be a basemap, not a regulation source.
 
 ## Prior art
-- **No credible open-source competitor.** The only close GitHub hit is a dead 2017 toy (3 stars, untouched since).
 - **Commercial space is split by function, not overlapping this idea directly:** ParkMobile/PayByPhone = meter payment only. SpotHero/ParkWhiz/BestParking = garage/lot booking, not street parking.
-- **SpotAngels is the real closest analog** — sweeping + meters + permit zones + crowdsourced rules across ~200 cities — but proprietary, closed-data, and doesn't do break-in risk at all.
-- **The actual gap:** nobody combines regulation data with a crime-risk overlay, and nothing in this space is open source.
+- **SpotAngels is the real closest multi-city analog** — sweeping + meters + permit zones + crowdsourced rules across ~200 cities — but proprietary, closed-data, and doesn't do break-in risk at all.
+- **The actual gap:** nobody combines regulation data with a crime-risk overlay, and no multi-city aggregator is open source.
+
+### Correction (2026-07-05): CURB (curb.guide) — SF is already excellently solved, open source
+Missed in the initial research pass (created 2026-06-08, likely too recent for the search index at the time) — Tucker found it directly. **[alevizio/curb](https://github.com/alevizio/curb)**, MIT licensed, live at curb.guide, actively maintained (pushed as recently as yesterday). This isn't a toy — it's genuinely sophisticated:
+
+- Matches ~1M real SF parking citations to exact street segments by **GPS** (not lossy address-string joins), via two SFMTA public-records requests (#26-5453 for citations, #26-5451 for actual sweeper GPS) — recovering ~815,000 of ~1M tickets with real coordinates that the public DataSF feed has dropped since ~2021.
+- Surfaces **when tickets actually get written**, not just the posted schedule: median ticket lands ~20 minutes into the window, ~77% within 45 minutes — a materially more useful signal than "sweeping is 8am–10am."
+- Covers sweeping, meters, RPP/permit zones, loading/color-curb zones (including unmetered white zones SFMTA doesn't publish on DataSF at all, pulled from their ArcGIS hub separately), and a beta truck-route inference layer.
+- Minimal-dependency architecture: one static `index.html`, vanilla JS + Leaflet, a few Vercel serverless functions, free tiers only.
+
+**What it doesn't do:** no crime/break-in overlay at all, and it's SF-only — no multi-city ambition, no common schema.
+
+**This changes the plan, not just the footnote.** Building "another SF parking app" now would be pure duplication of something already excellent and current. San Francisco drops as ParkPulse's launch city — see Launch cities below. CURB's GPS-matched-citation technique for inferring *real* enforcement timing (not just posted schedule) is worth treating as the bar to clear in whichever city ParkPulse actually builds first, if that city's own citation data supports the same trick.
 
 ## Architecture (draft)
 Given the "every city is its own integration" finding, the shape is a **pluggable per-city adapter behind a common schema** — CurbLR's original intent, just DIY'd rather than waiting on city-side adoption of a standard that stalled.
@@ -47,21 +58,24 @@ Given the "every city is its own integration" finding, the shape is a **pluggabl
 - **No OSM dependency for regulation data** — OSM (if used at all) is a basemap layer only, per the finding above.
 
 ## Launch cities (candidates, not final)
-Ranked by combined open-data coverage, each with its known gap:
-1. **San Francisco** — the only 4-for-4 city; obvious first build target.
-2. **Chicago** — strong on sweeping/permits/crime; meters is the one hole (would need a scraper or an explicit "meters unknown here" state).
-3. **Seattle** — strong on meters/permits/crime; sweeping schedule not confirmed open.
-4. **NYC** — richest regulation + meter data of any city, but no permit-zone model to speak of — different rule shape entirely (alternate-side parking, not sweeping).
-5. **Washington DC** — solid permits + crime, but an entirely different seasonal-rule regime (snow/leaf season, no sweeping program).
+**San Francisco removed as launch candidate** (2026-07-05) — CURB (curb.guide) already covers it exceptionally well, open source, actively maintained. Rebuilding it would be pure duplication. ParkPulse either skips SF entirely (link out to CURB for SF users) or, if included later, treats CURB's dataset/approach as a reference adapter rather than building one from scratch.
+
+Ranked by combined open-data coverage among cities with no comparable existing tool, each with its known gap:
+1. **Chicago** — strong on sweeping/permits/crime; meters is the one real hole (private concessionaire, no open API — would need a scraper or an explicit "meters unknown here" state). No CURB-equivalent found for Chicago — genuine open territory.
+2. **Seattle** — strong on meters/permits/crime; sweeping schedule not confirmed open. No CURB-equivalent found.
+3. **NYC** — richest regulation + meter data of any city, but no permit-zone model to speak of — different rule shape entirely (alternate-side parking, not sweeping). Worth a fresh prior-art check specifically for NYC before committing — CURB's existence for SF means other cities should be re-checked, not assumed clear.
+4. **Washington DC** — solid permits + crime, but an entirely different seasonal-rule regime (snow/leaf season, no sweeping program).
 
 ## Open questions
-- Is a 4-city (or fewer) v1 the right scope, or does even San Francisco alone make a better single-city proof of concept first?
+- **Before picking a first city, re-check for a CURB-equivalent there specifically.** CURB's existence (found by Tucker directly, missed by the initial research pass since it's <1 month old) means "no prior art found" can't be trusted without a fresh, dedicated check per candidate city — search indexes lag new repos.
+- Should ParkPulse cover SF at all, even as a thin adapter crediting/linking to CURB, or skip it entirely and stay out of an already-well-served city?
 - How to handle the "meters unknown" / "sweeping unknown" gaps in the UI honestly, without the product reading as unreliable where data just doesn't exist yet.
-- Crime-risk overlay: what aggregation (density heatmap? per-block score?) avoids the product feeling alarmist or crime-map-flavored while still being useful.
+- Crime-risk overlay: what aggregation (density heatmap? per-block score?) avoids the product feeling alarmist or crime-map-flavored while still being useful. This remains the one piece no prior art (including CURB) covers.
+- Whether a city's own citation data supports the GPS-matched-to-real-enforcement-time trick CURB pulled off for SF (requires the city to still publish/release citation GPS, or be willing to fulfill a public-records request the way SFMTA did) — worth checking per candidate city before committing, since it's the difference between "shows the posted schedule" and "shows when tickets actually land."
 - Update cadence and monitoring for city portal schema drift — Chicago's meter scraper precedent (community-maintained, unofficial) suggests this is a real, recurring maintenance cost, not a one-time build.
 
 ## Next steps
-- [ ] Build the San Francisco adapter first (only confirmed 4-for-4 city) — proves the common schema against real data before adding a second city
+- [ ] Re-check prior art specifically for Chicago and Seattle before committing to either as launch city — don't repeat the SF miss
+- [ ] Pick the first city from the remaining candidates once that check is done
 - [ ] Design the common schema with explicit per-category nullability from day one
-- [ ] Prototype the crime-risk aggregation approach on SF's vehicle-theft data
-- [ ] Decide the second launch city once SF is working, informed by what the SF build actually revealed about the schema's rough edges
+- [ ] Prototype the crime-risk aggregation approach — this is the piece no existing tool (including CURB) does
