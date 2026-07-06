@@ -1,6 +1,6 @@
 # Los Angeles
 
-Currently the strongest single candidate for ParkPulse's first real adapter — see SPEC.md → First adapters to build. Full standing: sweeping (fresh), meters (best documented anywhere), crime (open), permits (open but stale, disclosed honestly).
+Currently the strongest single candidate for Chalked's first real adapter — see SPEC.md → First adapters to build. Full standing: sweeping (fresh), meters (best documented anywhere), crime (open), permits (open but stale, disclosed honestly).
 
 ## Sweeping
 
@@ -35,13 +35,13 @@ Real, queryable, MultiPolygon geometry, fields `PPDNUM` + `PPDNAME`, public doma
 
 ## Crime
 
-`Crime Data from 2020 to Present` — `https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8` — open, Socrata-hosted. Not yet filtered down to vehicle-break-in-specific codes (see SPEC.md's Break-in/vehicle-crime data note) — and the crime-risk overlay itself is currently paused pending [Discussion #1](https://github.com/inkxel/parkpulse/discussions/1), so this is background context, not an active build target.
+`Crime Data from 2020 to Present` — `https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8` — open, Socrata-hosted. Not yet filtered down to vehicle-break-in-specific codes (see SPEC.md's Break-in/vehicle-crime data note) — and the crime-risk overlay itself is currently paused pending [Discussion #1](https://github.com/inkxel/chalked/discussions/1), so this is background context, not an active build target.
 
 ## Regional context: sweep.la
 
 **[sweep.la](https://sweep.la)** ("Sweep LA") aggregates sweeping lookups for LA plus **4 neighboring cities** — Santa Monica, Glendale, West Hollywood, Pasadena — each running its own independent program. Multilingual (en/es/ko/ru/tl), PWA, "as-is, not affiliated with the City of Los Angeles." No GitHub link found — not confirmed open source, unlike [CURB](san-francisco.md).
 
-This is real signal that crossing city boundaries already happens at solo/small-team scale in this space — but it doesn't remove the reason for a real, open ParkPulse adapter: sweep.la isn't confirmed open source, and the 4 neighboring cities' own data sources haven't been independently traced yet (see the coverage list in the README).
+This is real signal that crossing city boundaries already happens at solo/small-team scale in this space — but it doesn't remove the reason for a real, open Chalked adapter: sweep.la isn't confirmed open source, and the 4 neighboring cities' own data sources haven't been independently traced yet (see the coverage list in the README).
 
 ## No CURB-equivalent found for LA specifically
 

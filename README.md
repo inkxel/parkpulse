@@ -1,6 +1,6 @@
-# ParkPulse
+# Chalked
 
-Drop a pin or enter an address, get the full read on street parking there: street sweeping schedule, time limits, meters (and whether they're free on weekends/evenings), and permit-parking zone status. (A break-in/vehicle-crime-risk layer is a paused, open question — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/parkpulse/discussions/1) — not something we're shipping without real input first.)
+Drop a pin or enter an address, get the full read on street parking there: street sweeping schedule, time limits, meters (and whether they're free on weekends/evenings), and permit-parking zone status. (A break-in/vehicle-crime-risk layer is a paused, open question — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/chalked/discussions/1) — not something we're shipping without real input first.)
 
 **Status: spec stage, research-informed.** No national data standard exists for this — every city publishes (or doesn't publish) its own parking data differently. The map itself will be national from day one (US Census boundaries, always complete); actual parking-rule coverage grows jurisdiction by jurisdiction, shown honestly — supported areas in full color, everywhere else grayed out with a link to help add it. See [SPEC.md](SPEC.md) for the full data landscape and architecture.
 
@@ -8,7 +8,7 @@ Drop a pin or enter an address, get the full read on street parking there: stree
 
 This is early — spec-stage, no app yet — which means right now the highest-leverage way to help isn't code. In order of "you can do this in the next five minutes":
 
-- **Weigh in on the crime-risk question** — [Discussion #1](https://github.com/inkxel/parkpulse/discussions/1). This is a live, genuinely undecided ethical call, not a rhetorical question — opinions actually change what gets built.
+- **Weigh in on the crime-risk question** — [Discussion #1](https://github.com/inkxel/chalked/discussions/1). This is a live, genuinely undecided ethical call, not a rhetorical question — opinions actually change what gets built.
 - **Don't see your city below? Open an issue for it.** One issue per jurisdiction is how this gets tracked — see the five already open (Los Angeles, NYC, Chicago, Seattle, DC) for the format. If you know your city's open-data landscape, or even just that it *has* one, that's worth a comment even before anyone commits to building an adapter.
 - **Know a "hidden" parking rule with no signage?** (Like Walnut, CA's citywide overnight-permit requirement — no signs anywhere, you're just expected to know.) Say so on the relevant jurisdiction issue, or open a new one. These are exactly the rules a tool like this can't find on its own — see SPEC.md → "Beyond open data."
 - **Help fill in the Coverage list below** — even "I checked and City X has no open data at all" is useful, it stops the same ground getting re-covered.
@@ -33,8 +33,8 @@ Most rows below say "not yet researched" — that's the honest current state, no
 **Arkansas** — Little Rock — not yet researched.
 
 **California** —
-- **Los Angeles** — Sweeping: ✅ [LADOT Posted Street Sweeping Routes](https://services1.arcgis.com/PTh9WC0Sf2WS7AAq/arcgis/rest/services/Posted_Street_Sweeping_Routes_Update/FeatureServer/0), actively edited. Meters: ✅ [LADOT Metered Parking Inventory & Policies](https://data.lacity.org/Transportation/LADOT-Metered-Parking-Inventory-Policies/s49e-q6j2) — best-documented meter dataset of any city checked. Permits: ⚠️ [Preferential Parking Districts](https://data.lacity.org/resource/s3st-6nwi.json), real but not updated since 2015-08-13. Crime: ✅ [Crime Data 2020–Present](https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8). → [Issue #2](https://github.com/inkxel/parkpulse/issues/2)
-- San Francisco — Sweeping: ✅ [DataSF `yhqp-riqs`](https://data.sfgov.org/resource/yhqp-riqs.json). Meters: ✅ [DataSF `8vzz-qzz9`](https://data.sfgov.org/resource/8vzz-qzz9.json). Permits/RPP: ⚠️ [DataSF `hi6h-neyh`](https://data.sfgov.org/resource/hi6h-neyh.json) — SFMTA's own 2017 set, flagged by the city as not comprehensively updated. Crime: ✅ [DataSF `ab4h-6ztd`](https://data.sfgov.org/resource/ab4h-6ztd.json). **Already excellently covered by [CURB](https://curb.guide)** — no ParkPulse adapter needed.
+- **Los Angeles** — Sweeping: ✅ [LADOT Posted Street Sweeping Routes](https://services1.arcgis.com/PTh9WC0Sf2WS7AAq/arcgis/rest/services/Posted_Street_Sweeping_Routes_Update/FeatureServer/0), actively edited. Meters: ✅ [LADOT Metered Parking Inventory & Policies](https://data.lacity.org/Transportation/LADOT-Metered-Parking-Inventory-Policies/s49e-q6j2) — best-documented meter dataset of any city checked. Permits: ⚠️ [Preferential Parking Districts](https://data.lacity.org/resource/s3st-6nwi.json), real but not updated since 2015-08-13. Crime: ✅ [Crime Data 2020–Present](https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8). → [Issue #2](https://github.com/inkxel/chalked/issues/2)
+- San Francisco — Sweeping: ✅ [DataSF `yhqp-riqs`](https://data.sfgov.org/resource/yhqp-riqs.json). Meters: ✅ [DataSF `8vzz-qzz9`](https://data.sfgov.org/resource/8vzz-qzz9.json). Permits/RPP: ⚠️ [DataSF `hi6h-neyh`](https://data.sfgov.org/resource/hi6h-neyh.json) — SFMTA's own 2017 set, flagged by the city as not comprehensively updated. Crime: ✅ [DataSF `ab4h-6ztd`](https://data.sfgov.org/resource/ab4h-6ztd.json). **Already excellently covered by [CURB](https://curb.guide)** — no Chalked adapter needed.
 - Glendale, Pasadena, Santa Monica, West Hollywood — Sweeping: 🔍 via [sweep.la](https://sweep.la), not independently sourced. Meters/Permits/Crime: not yet researched.
 
 **Colorado** — Denver — not yet researched.
@@ -51,7 +51,7 @@ Most rows below say "not yet researched" — that's the honest current state, no
 
 **Idaho** — Boise — not yet researched.
 
-**Illinois** — **Chicago** — Sweeping: ✅ [Street Sweeping Schedule 2025](https://data.cityofchicago.org/Sanitation/Street-Sweeping-Schedule-2025/a2xx-z2ja). Permits: ✅ [Permit Parking Zones](https://data.cityofchicago.org/Transportation/Permit-Parking-Zones/qiag-khha). Meters: ❌ private concessionaire, no open API (unofficial scraper: [stevevance/Chicago-Parking-Meters](https://github.com/stevevance/Chicago-Parking-Meters)). Crime: ✅ [Motor Vehicle Theft](https://data.cityofchicago.org/Public-Safety/motor-vehicle-theft/7ac4-d9tk). → [Issue #4](https://github.com/inkxel/parkpulse/issues/4)
+**Illinois** — **Chicago** — Sweeping: ✅ [Street Sweeping Schedule 2025](https://data.cityofchicago.org/Sanitation/Street-Sweeping-Schedule-2025/a2xx-z2ja). Permits: ✅ [Permit Parking Zones](https://data.cityofchicago.org/Transportation/Permit-Parking-Zones/qiag-khha). Meters: ❌ private concessionaire, no open API (unofficial scraper: [stevevance/Chicago-Parking-Meters](https://github.com/stevevance/Chicago-Parking-Meters)). Crime: ✅ [Motor Vehicle Theft](https://data.cityofchicago.org/Public-Safety/motor-vehicle-theft/7ac4-d9tk). → [Issue #4](https://github.com/inkxel/chalked/issues/4)
 
 **Indiana** — Indianapolis — not yet researched.
 
@@ -89,7 +89,7 @@ Most rows below say "not yet researched" — that's the honest current state, no
 
 **New Mexico** — Albuquerque — not yet researched.
 
-**New York** — **New York City** — Regulations/time limits: ✅ [Parking Regulation Locations and Signs](https://data.cityofnewyork.us/Transportation/Parking-Regulation-Locations-and-Signs/nfid-uabd), 439K rows, daily-updated. Meters: ✅ [ParkNYC Block Faces](https://data.cityofnewyork.us/Transportation/Parking-Meters-ParkNYC-Blockfaces/s7zi-dgdx). Permits: ❌ no citywide model — alternate-side-parking instead. Crime: ✅ [NYPD Complaint Data Historic](https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Historic/qgea-i56i). → [Issue #3](https://github.com/inkxel/parkpulse/issues/3)
+**New York** — **New York City** — Regulations/time limits: ✅ [Parking Regulation Locations and Signs](https://data.cityofnewyork.us/Transportation/Parking-Regulation-Locations-and-Signs/nfid-uabd), 439K rows, daily-updated. Meters: ✅ [ParkNYC Block Faces](https://data.cityofnewyork.us/Transportation/Parking-Meters-ParkNYC-Blockfaces/s7zi-dgdx). Permits: ❌ no citywide model — alternate-side-parking instead. Crime: ✅ [NYPD Complaint Data Historic](https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Historic/qgea-i56i). → [Issue #3](https://github.com/inkxel/chalked/issues/3)
 
 **North Carolina** — Charlotte — not yet researched.
 
@@ -119,7 +119,7 @@ Most rows below say "not yet researched" — that's the honest current state, no
 
 **Virginia** — Virginia Beach — not yet researched.
 
-**Washington** — **Seattle** — Permits/RPZ: ✅ [Restricted Parking Zones](https://data-seattlecitygis.opendata.arcgis.com/datasets/SeattleCityGIS::restricted-parking-zones). Crime: ✅ [SPD Crime Data 2008–Present](https://data.seattle.gov/Public-Safety/SPD-Crime-Data-2008-Present/tazs-3rd5). Meters: 🔍 described as unusually rich in research, exact link unconfirmed. Sweeping: not yet confirmed open — worth a dashboard-tracing check before assuming absent. → [Issue #5](https://github.com/inkxel/parkpulse/issues/5)
+**Washington** — **Seattle** — Permits/RPZ: ✅ [Restricted Parking Zones](https://data-seattlecitygis.opendata.arcgis.com/datasets/SeattleCityGIS::restricted-parking-zones). Crime: ✅ [SPD Crime Data 2008–Present](https://data.seattle.gov/Public-Safety/SPD-Crime-Data-2008-Present/tazs-3rd5). Meters: 🔍 described as unusually rich in research, exact link unconfirmed. Sweeping: not yet confirmed open — worth a dashboard-tracing check before assuming absent. → [Issue #5](https://github.com/inkxel/chalked/issues/5)
 
 **West Virginia** — Charleston — not yet researched.
 
@@ -127,7 +127,7 @@ Most rows below say "not yet researched" — that's the honest current state, no
 
 **Wyoming** — Cheyenne — not yet researched.
 
-**District of Columbia** *(not a state, included as its own entry)* — **Washington** — Sweeping: N/A, no residential sweeping program (snow-emergency/leaf-season rules instead). Permits: ✅ [Residential Parking Permit Blocks](https://opendata.dc.gov/datasets/DCGIS::residential-parking-permit-blocks). Meters: 🔍 ParkDC referenced, exact dataset unconfirmed. Crime: 🔍 described as open, exact link unconfirmed. → [Issue #6](https://github.com/inkxel/parkpulse/issues/6)
+**District of Columbia** *(not a state, included as its own entry)* — **Washington** — Sweeping: N/A, no residential sweeping program (snow-emergency/leaf-season rules instead). Permits: ✅ [Residential Parking Permit Blocks](https://opendata.dc.gov/datasets/DCGIS::residential-parking-permit-blocks). Meters: 🔍 ParkDC referenced, exact dataset unconfirmed. Crime: 🔍 described as open, exact link unconfirmed. → [Issue #6](https://github.com/inkxel/chalked/issues/6)
 
 ## Why this project exists
 

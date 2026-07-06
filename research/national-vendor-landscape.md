@@ -4,7 +4,7 @@ Tucker's question, researched properly rather than guessed at: is there a nation
 
 **Short answer: no free shortcut exists. Every major vendor gates its data behind a commercial relationship, not a self-serve API.**
 
-- **Meter payment vendors** (ParkMobile, Passport, PayByPhone, Flowbird, IPS Group) all have *an* API. None is open. **Passport** is the widest — its Parking Rights API normalizes rates/rules/restrictions across "hundreds of cities" (20,000+ zones claimed) into one feed — but it's partner-gated, built for OEMs and wayfinding apps that sign a business-dev agreement, not something ParkPulse could just plug into.
+- **Meter payment vendors** (ParkMobile, Passport, PayByPhone, Flowbird, IPS Group) all have *an* API. None is open. **Passport** is the widest — its Parking Rights API normalizes rates/rules/restrictions across "hundreds of cities" (20,000+ zones claimed) into one feed — but it's partner-gated, built for OEMs and wayfinding apps that sign a business-dev agreement, not something Chalked could just plug into.
 - **Real-time spot occupancy still doesn't meaningfully exist nationally.** The SFpark sensor program (retired 2014) never really came back at scale. What exists now — computer-vision curb cameras (Automotus, Cleverciti), INRIX's predictive modeling — covers a couple dozen cities at most, mostly loading zones for the camera approach; even INRIX's own real (non-predicted) occupancy data only covers 13 of its 126 US markets. Not a near-term feature to plan around.
 - **Residential permit software** (T2 Systems, gtechna, iParq, Passport, Unity5, CityView) consolidates *operationally* — a handful of vendors run many cities' citizen-facing permit portals — but none of them publish open zone-boundary data. They're enforcement/citizen tools, not data publishers. Where permit-zone data is public at all, it's because an individual city's GIS team put it on their own portal — same city-by-city pattern as everything else in this research.
 - **Citation-processing vendors** (Duncan Solutions, Complus Data Innovations — 200+ municipal clients across 25 states, Conduent) also consolidate operationally with zero open data — billing/collections back-ends, not datasets.
@@ -12,7 +12,7 @@ Tucker's question, researched properly rather than guessed at: is there a nation
 
 ## The one real exception, worth chasing directly
 
-The **Curb Data Specification (CDS)**, from the Open Mobility Foundation — initially written off as B2B-focused (built for dockless-vehicle and loading-zone management between cities and mobility operators) — turns out to have real, if early, adoption: roughly **11 US cities**, including **LA, SF, DC, and Seattle** — four cities already on ParkPulse's candidate list (see SPEC.md → First adapters to build).
+The **Curb Data Specification (CDS)**, from the Open Mobility Foundation — initially written off as B2B-focused (built for dockless-vehicle and loading-zone management between cities and mobility operators) — turns out to have real, if early, adoption: roughly **11 US cities**, including **LA, SF, DC, and Seattle** — four cities already on Chalked's candidate list (see SPEC.md → First adapters to build).
 
 CDS is a genuinely open, free, GTFS-like standard — not a gated vendor product. If these cities' actual CDS feeds cover sweeping/permit-relevant data, not just the loading-zone/curb-use data CDS was originally built for, that's a real shortcut: one schema parser instead of four bespoke per-city adapters.
 

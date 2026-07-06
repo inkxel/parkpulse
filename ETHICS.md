@@ -1,4 +1,4 @@
-# Open ethical question: should ParkPulse show a break-in/crime-risk layer at all?
+# Open ethical question: should Chalked show a break-in/crime-risk layer at all?
 
 This isn't a settled feature. It's paused, and posed here deliberately instead of shipped quietly, because the tradeoff is real on both sides.
 
@@ -26,4 +26,4 @@ There's also a scope-creep risk: the clearly-legitimate core of this project is 
 - Opt-in, off by default
 - Explicit, visible caveats about data limitations wherever it's shown, not just in this doc
 
-**Discuss here:** [github.com/inkxel/parkpulse/discussions/1](https://github.com/inkxel/parkpulse/discussions/1). This file states the tradeoff; the discussion is where it actually gets decided.
+**Discuss here:** [github.com/inkxel/chalked/discussions/1](https://github.com/inkxel/chalked/discussions/1). This file states the tradeoff; the discussion is where it actually gets decided.

@@ -1,6 +1,6 @@
 # Research
 
-Findings, prior-art investigations, and reusable methods behind ParkPulse's data landscape — the detailed backing for what's summarized in SPEC.md and the coverage list in the README.
+Findings, prior-art investigations, and reusable methods behind Chalked's data landscape — the detailed backing for what's summarized in SPEC.md and the coverage list in the README.
 
 Notes here cross-reference each other with normal markdown links, not double-bracket wiki syntax — GitHub's standard file viewer doesn't render `[[links]]` as anything but literal text, so plain links are what actually work here.
 
@@ -37,7 +37,7 @@ Every city file should be linked from its state's file, and every state file sho
 
 **Cities**
 - [Los Angeles](cities/los-angeles.md) — sweeping, permits, meters, crime, sweep.la regional context
-- [San Francisco](cities/san-francisco.md) — CURB, SF's own data sources, why no ParkPulse adapter here
+- [San Francisco](cities/san-francisco.md) — CURB, SF's own data sources, why no Chalked adapter here
 
 *(Chicago, NYC, Seattle, DC have entries in the README's coverage table and their own jurisdiction issues, but no dedicated research file yet — they'll get one, and their state gets an index page, once someone researches them past the summary level.)*
 
