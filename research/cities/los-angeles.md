@@ -31,6 +31,8 @@ https://data.lacity.org/resource/s3st-6nwi.json
 
 Real, queryable, MultiPolygon geometry, fields `PPDNUM` + `PPDNAME`, public domain (CC0).
 
+**Adapter built and browser-verified (2026-07-06):** `scripts/fetch_la_permits.py` — 155 districts, small enough to render directly with no clustering needed. Rendered as a distinct dashed-blue outline (not the sweeping green/amber/red scale — permits are an eligibility question the app can't resolve on its own, matching SPEC.md's Visual design distinction), with the 2015 staleness surfaced directly in the click panel, not just in this doc.
+
 **The honest catch:** `rowsUpdatedAt` is **2015-08-13** — the same as its creation date. Despite the dataset's own metadata claiming a "Committed Update Frequency: Annual," there's no evidence it's actually been refreshed once in a decade. Any preferential parking district created, resized, or retired since 2015 wouldn't show up. Different risk profile than the sweeping data (which has active edit tracking) — real and usable, but needs a "data as of 2015" disclosure if used, and probably a periodic manual check against LADOT's current signage rather than blind trust.
 
 ## Meters

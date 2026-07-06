@@ -80,7 +80,14 @@ if (DEBUG_TIME) {
 }
 
 const map = L.map("map").setView([34.0522, -118.2437], 11);
-window.map = map; // exposed for QA/testing (e.g. Playwright driving the map programmatically)
+// Exposed for QA/testing (e.g. Playwright driving the map programmatically).
+// Gotcha worth remembering: map.latLngToContainerPoint() returns coordinates relative to
+// the #map div, not the page -- add document.getElementById("map").getBoundingClientRect()'s
+// left/top before feeding a computed point to something like Playwright's page.mouse.click(),
+// which expects page-relative coordinates. Missing this offset (the header's height) produces
+// a "close but always misses" click that looks like an app bug but isn't -- confirmed by
+// firing the Leaflet click event directly on the layer object instead, which worked.
+window.map = map;
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
   maxZoom: 19,
@@ -108,6 +115,20 @@ function renderMeterPanel(meter) {
     `${meter.rate_type} rate ${meter.rate}, ${meter.time_limit} limit. ` +
     `<em>No operating-hours/schedule data available for LA meters (see research/cities/los-angeles.md) — ` +
     `check the posted meter sign for when payment is actually required.</em>`;
+}
+
+// Permits are an eligibility gate, not a timing question (SPEC.md's Visual design section)
+// -- the app can't know if *this user* holds the right permit for *this* district, so it's
+// a flag, not a status level. The 2015 staleness (research/cities/los-angeles.md) is
+// surfaced directly here, not just in docs -- a decade-old boundary shouldn't read with
+// the same confidence as fresh data.
+function renderPermitPanel(district) {
+  statusPanel.innerHTML =
+    `<span class="dot blue"></span>` +
+    `<strong>Preferential Parking District ${district.district_number}</strong> ` +
+    `(${district.district_name}) — permit required for unrestricted parking here. ` +
+    `<strong style="color:#c62828">Data as of ${district.data_as_of}</strong> — LADOT hasn't ` +
+    `confirmed an update since then, so district boundaries may not reflect changes made after that date.`;
 }
 
 function styleFeature(now) {
@@ -189,6 +210,39 @@ document.getElementById("layer-sweeping").addEventListener("change", (e) => {
   if (!geoLayer) return;
   if (e.target.checked) map.addLayer(geoLayer);
   else map.removeLayer(geoLayer);
+});
+
+// Permits layer -- only 155 districts citywide, small enough to render directly, no
+// clustering needed. Distinct blue outline (not the sweeping green/amber/red scale),
+// matching CURB's own "permit-blue" precedent for the same reason: eligibility, not timing.
+let permitsLayer = null;
+let permitsLoadPromise = null;
+
+function loadPermitsLayer() {
+  if (permitsLoadPromise) return permitsLoadPromise;
+  permitsLoadPromise = fetch("data/la-permits.geojson")
+    .then((r) => r.json())
+    .then((data) => {
+      permitsLayer = L.geoJSON(data, {
+        style: { color: "#1565c0", weight: 1.5, fillOpacity: 0.15, dashArray: "4 3" },
+        onEachFeature: (feature, layer) => {
+          layer.on("click", () => renderPermitPanel(feature.properties));
+        },
+      });
+      return permitsLayer;
+    })
+    .catch((err) => {
+      statusPanel.textContent = "Couldn't load permits data: " + err.message;
+    });
+  return permitsLoadPromise;
+}
+
+document.getElementById("layer-permits").addEventListener("change", (e) => {
+  if (e.target.checked) {
+    loadPermitsLayer().then((layer) => layer && map.addLayer(layer));
+  } else if (permitsLayer) {
+    map.removeLayer(permitsLayer);
+  }
 });
 
 // Address search via the free US Census Geocoder — no API key, and it's the same
