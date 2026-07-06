@@ -16,10 +16,15 @@ Most of what belongs in this folder is genuinely light work: does a dataset exis
 
 ## Index
 
+One file per city, covering everything found for that city (all categories, prior art, decisions). A separate small set of files for findings that genuinely aren't about one city — methods and cross-city landscape research — kept apart rather than force-fit into a jurisdiction that doesn't own them.
+
+**Cities**
+- [Los Angeles](los-angeles.md) — sweeping, permits, meters, crime, sweep.la regional context
+- [San Francisco](san-francisco.md) — CURB, SF's own data sources, why no ParkPulse adapter here
+
+*(Chicago, NYC, Seattle, DC have entries in the README's coverage table and their own jurisdiction issues, but no dedicated research file yet — they'll get one once someone researches them past the summary level.)*
+
+**Methods & cross-city landscape**
 - [Dashboard-tracing method](dashboard-tracing-method.md) — how to find real data hiding behind a public-facing ArcGIS dashboard
 - [Municipal code hosting & unsigned rules](municipal-code-hosting.md) — the Walnut, CA case, and where to look for code-only rules
 - [National vendor & standard landscape](national-vendor-landscape.md) — meter vendors, CDS, Parkopedia, and why none of them are a free shortcut (except maybe one)
-- [CURB (curb.guide)](curb-guide.md) — SF prior art
-- [sweep.la](sweep-la.md) — LA-metro prior art
-- [Los Angeles: sweeping](los-angeles-sweeping.md)
-- [Los Angeles: permits](los-angeles-permits.md)

@@ -1,4 +1,8 @@
-# CURB (curb.guide) — SF prior art
+# San Francisco
+
+**Not a ParkPulse adapter target** — already excellently covered by an existing open-source tool. This file documents why, and SF's underlying data for reference.
+
+## CURB (curb.guide)
 
 Missed in the initial research pass (created 2026-06-08, likely too recent for the search index at the time) — Tucker found it directly. **[alevizio/curb](https://github.com/alevizio/curb)**, MIT licensed, live at [curb.guide](https://curb.guide), actively maintained. Not a toy — genuinely sophisticated:
 
@@ -12,8 +16,14 @@ Missed in the initial research pass (created 2026-06-08, likely too recent for t
 
 **Why this changed the plan, not just a footnote:** building "another SF parking app" would be pure duplication of something already excellent and current. San Francisco is deliberately not a ParkPulse launch candidate (see SPEC.md → First adapters to build). CURB's GPS-matched-citation technique for inferring real enforcement timing (not just posted schedule) is worth treating as the bar to clear in whichever city ParkPulse actually builds first, if that city's own citation data supports the same trick.
 
-**SF's underlying data sources** (documented in CURB's own `CLAUDE.md`, all DataSF/Socrata, CORS-open):
+## SF's underlying data sources
+
+Documented in CURB's own `CLAUDE.md`, all DataSF/Socrata, CORS-open:
 - Street sweeping — `yhqp-riqs`
 - Parking meters — `8vzz-qzz9`
 - Parking regulations / RPP — `hi6h-neyh` (SFMTA's own 2017 set, flagged by the city as not comprehensively updated)
 - Parking citations — `ab4h-6ztd` (23.8M rows, daily, ~2–5 day lag; GPS restored for ~815K post-2024 rows via public-records request)
+
+## Open question
+
+Should ParkPulse show SF at all on its coverage map — as "covered, see CURB" with a link out, or leave it visually gray like anywhere else unsupported? Leaving it gray undersells that SF *is* solved, just by someone else. See SPEC.md → Open questions.

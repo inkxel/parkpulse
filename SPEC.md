@@ -37,9 +37,8 @@ OSM has real tagging conventions (`parking:lane=*`, `parking:condition=*`), but 
 - **Commercial space is split by function, not overlapping this idea directly:** ParkMobile/PayByPhone = meter payment only. SpotHero/ParkWhiz/BestParking = garage/lot booking, not street parking.
 - **SpotAngels is the real closest multi-city analog** — sweeping + meters + permit zones + crowdsourced rules across ~200 cities — but proprietary, closed-data, and doesn't do break-in risk at all.
 - **The actual gap:** nobody combines regulation data with a crime-risk overlay, and no multi-city aggregator is open source.
-- **[CURB (curb.guide)](research/curb-guide.md)** — SF is already excellently solved, open source. San Francisco is deliberately not a ParkPulse launch candidate as a result — see First adapters to build.
-- **[sweep.la](research/sweep-la.md)** — LA + 4 neighboring cities, aggregated, not confirmed open source.
-- **[LA sweeping](research/los-angeles-sweeping.md)** and **[LA permits](research/los-angeles-permits.md)** — both real and queryable, found via the **[dashboard-tracing method](research/dashboard-tracing-method.md)** (worth applying to Chicago/Seattle's remaining gaps before trusting them). LA permits carries a real staleness caveat (not updated since 2015).
+- **[San Francisco](research/san-francisco.md)** — already excellently solved by CURB (curb.guide), open source. Deliberately not a ParkPulse launch candidate as a result — see First adapters to build.
+- **[Los Angeles](research/los-angeles.md)** — sweeping and permits both real and queryable, found via the **[dashboard-tracing method](research/dashboard-tracing-method.md)** (worth applying to Chicago/Seattle's remaining gaps before trusting them); permits carries a real staleness caveat (not updated since 2015). Includes sweep.la regional context (LA + 4 neighboring cities, aggregated, not confirmed open source).
 
 Full findings, sources, and the reusable method live in `research/` — this section is the summary.
 

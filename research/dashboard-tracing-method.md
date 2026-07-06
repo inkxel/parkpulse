@@ -10,7 +10,9 @@
 4. Query the Feature Service directly: `<url>?f=json` for schema, `<url>/query?where=1=1&outFields=*&f=json` for real records. No API key needed for public services.
 
 **Confirmed working on:**
-- LA's street sweeping dashboard → `Posted_Street_Sweeping_Routes_Update` FeatureServer (see [Los Angeles: sweeping](los-angeles-sweeping.md))
-- LA's Preferential Parking Districts dashboard → `LADOT_PPD` FeatureServer (see [Los Angeles: permits](los-angeles-permits.md))
+- LA's street sweeping dashboard → `Posted_Street_Sweeping_Routes_Update` FeatureServer
+- LA's Preferential Parking Districts dashboard → `LADOT_PPD` FeatureServer
+
+Both documented in full in [Los Angeles](los-angeles.md).
 
 **Where to apply this next:** any jurisdiction marked "unconfirmed" or "gap" in the coverage list — that status may just mean nobody's traced the dashboard yet, not that the data doesn't exist. Chicago and Seattle's sweeping-schedule gaps are the most likely next candidates for this to overturn, given LA's own gap turned out to be wrong twice.
