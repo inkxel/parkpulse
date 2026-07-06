@@ -1,8 +1,8 @@
 # ParkPulse
 
-Drop a pin or enter an address, get the full read on street parking there: street sweeping schedule, time limits, meters (and whether they're free on weekends/evenings), permit-parking zone status, and a break-in-risk overlay from public crime data.
+Drop a pin or enter an address, get the full read on street parking there: street sweeping schedule, time limits, meters (and whether they're free on weekends/evenings), and permit-parking zone status. (A break-in/vehicle-crime-risk layer is a paused, open question — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/parkpulse/discussions/1) — not something we're shipping without real input first.)
 
-**Status: spec stage, research-informed.** No national data standard exists for this — every city publishes (or doesn't publish) its own parking data differently. The map itself is national from day one (US Census boundaries, always complete); actual parking-rule coverage grows jurisdiction by jurisdiction, shown honestly — supported areas in full color, everywhere else grayed out with a link to help add it. See [SPEC.md](SPEC.md) for the real data landscape and the coverage architecture.
+**Status: spec stage, research-informed.** No national data standard exists for this — every city publishes (or doesn't publish) its own parking data differently. The map itself is national from day one (US Census boundaries, always complete); actual parking-rule coverage grows jurisdiction by jurisdiction, shown honestly — supported areas in full color, everywhere else grayed out with a link to help add it. See [SPEC.md](SPEC.md) for the real data landscape and the coverage architecture, and **[COVERAGE.md](COVERAGE.md) for what's actually confirmed, city by city, browsable and growing.**
 
 ## Why this project exists
 
