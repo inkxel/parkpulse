@@ -1,5 +1,21 @@
 # Chalked — Spec
 
+## Current status (2026-07-06) — read this first
+
+**A real, working, browser-verified v0 slice exists.** Not just spec — actual code, at the repo root (`index.html`, `app.js`, `scripts/`, `data/`).
+
+**What works right now:**
+- National coverage map: all 19,731 US incorporated places, LA shown supported, everywhere else honestly gray, click anywhere for a real jurisdiction-specific answer. See [research/national-boundary-layer.md](research/national-boundary-layer.md).
+- LA fully built: sweeping (864 zones, live green/amber/red status), meters (34,943 points, clustered), permits (155 districts, staleness-disclosed). Crime is deliberately paused — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/chalked/discussions/1).
+- Address search (Nominatim, US-constrained) and a `?debugTime=` override for testing status coloring without waiting for a real weekday morning.
+- Everything above was verified in an actual browser via the Playwright CLI skill, not just logic-tested — see commit history for specifics on what broke and what was fixed (a CORS geocoder failure, a ZIP-ambiguity bug, a coordinate-system testing gotcha documented in `app.js`).
+
+**To pick this up cold:** run the four `scripts/fetch_*.py` adapters (see README → "Running the v0 slice locally"), serve with `python3 -m http.server`, open it, and look. Then read "Next steps" at the bottom of this file — it's kept current, not aspirational.
+
+**Not built yet, most-likely-next first:** a second city's adapter (to prove the pattern generalizes beyond LA), the error-report → GitHub Issue pipeline, the ParkUsher investigation, the disclaimer UI, the CONTRIBUTING guide.
+
+---
+
 ## Concept
 Address or pin in, full street-parking picture out: street sweeping schedule, time limits, meters (including whether they're free on weekends/evenings), and permit-parking zone status. A break-in/vehicle-crime-risk layer is **paused, not committed** — see [ETHICS.md](ETHICS.md) and [Discussion #1](https://github.com/inkxel/chalked/discussions/1) — the harm/bias risk of a naive crime overlay is real enough that it shouldn't ship without community input first.
 
