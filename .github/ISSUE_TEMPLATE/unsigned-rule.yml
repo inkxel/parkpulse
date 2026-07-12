@@ -1,0 +1,30 @@
+name: Unsigned / code-only rule report
+description: A real parking rule that exists only in municipal code, with no posted signage anywhere — see the Walnut, CA case in research/municipal-code-hosting.md.
+title: "[unsigned-rule] "
+labels: ["data-issue", "unsigned-rule"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when you know about a real, binding parking rule that **isn't posted anywhere** — Chalked's whole "always defer to the posted sign" safety net doesn't help when there's no sign to defer to. See `research/municipal-code-hosting.md` for why this is its own report type, distinct from a signed-zone data error, and `schema/common-schema.md`'s "jurisdiction-wide default rules" section for how it eventually becomes real data.
+
+        This is exactly the kind of local knowledge that's genuinely hard to find by scraping — Tucker knew about Walnut's rule because he has in-laws there. If you know a city's rule like this, you're the fastest way Chalked finds out about it.
+  - type: input
+    id: jurisdiction
+    attributes:
+      label: Jurisdiction
+      placeholder: "Walnut, CA"
+    validations:
+      required: true
+  - type: textarea
+    id: rule
+    attributes:
+      label: What's the rule?
+      description: Describe it as specifically as you can — who it applies to, when, where it applies (citywide, or a specific area?), and how you know about it (you live there, you got a ticket, you've read the code yourself).
+    validations:
+      required: true
+  - type: input
+    id: citation
+    attributes:
+      label: Municipal code citation (if known)
+      description: e.g. "Walnut Municipal Code §10.20.040". See research/municipal-code-hosting.md for how to find a city's code online (usually Municode, American Legal, or General Code) if you want to track it down yourself.

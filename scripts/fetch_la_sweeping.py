@@ -78,6 +78,11 @@ def transform(raw_geojson, synced_at):
                     "maintenance_district": props.get("Maint_District"),
                     "maintenance_district_name": props.get("MD_Name"),
                     "route_type": props.get("Route_Type"),
+                    # data_as_of == last_synced here on purpose: this source is actively
+                    # edited (see SPEC.md's LA correction), so the data's own vintage IS
+                    # today's sync -- unlike permits, where the two diverge. See
+                    # schema/common-schema.md for why both fields exist.
+                    "data_as_of": synced_at,
                     "source": {
                         "name": "LADOT Posted Street Sweeping Routes",
                         "url": SOURCE_URL,

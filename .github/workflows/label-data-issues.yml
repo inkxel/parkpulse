@@ -1,0 +1,88 @@
+name: Auto-label data-issue reports
+
+# Automates the triage step schema/error-report-pipeline.md flagged as manual by design
+# ("automating it is a reasonable future improvement once report volume justifies it") --
+# cheap enough to build now that there's no reason to keep doing it by hand.
+#
+# Parses the issue-form body for the "Jurisdiction"/"Category" fields (data-issue.yml and
+# unsigned-rule.yml both have a Jurisdiction field; only data-issue.yml has Category) and
+# applies city:<slug> / category:<value> labels -- the label family SPEC.md's "Trust, error
+# reporting & disclaimer" section calls for, distinct from epic/ready/blocked planning labels.
+# Doesn't touch issues that aren't from one of these two templates (scoped via the
+# data-issue label the templates already apply on creation).
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    if: contains(github.event.issue.labels.*.name, 'data-issue')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract jurisdiction/category and apply labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || "";
+
+            // Issue-form fields render as "### <Label>\n\n<answer>\n\n### <Next label>...".
+            // Grabs the text between a given heading and the next heading (or end of body).
+            function extractField(label) {
+              const re = new RegExp(`### ${label}\\s*\\n\\n([^\\n]+)`, "i");
+              const match = body.match(re);
+              return match ? match[1].trim() : null;
+            }
+
+            function slugify(text) {
+              return text
+                .split(",")[0] // "Los Angeles, CA" -> "Los Angeles" -- state abbreviation isn't part of the slug
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+            }
+
+            const KNOWN_CATEGORIES = new Set(["sweeping", "meters", "permits", "crime"]);
+
+            const jurisdiction = extractField("Jurisdiction");
+            const category = extractField("Category");
+
+            const labelsToApply = [];
+            if (jurisdiction) {
+              const slug = slugify(jurisdiction);
+              if (slug) labelsToApply.push(`city:${slug}`);
+            }
+            if (category && KNOWN_CATEGORIES.has(category.toLowerCase())) {
+              labelsToApply.push(`category:${category.toLowerCase()}`);
+            }
+
+            if (labelsToApply.length === 0) {
+              console.log("No jurisdiction/category field found in the issue body -- nothing to label.");
+              return;
+            }
+
+            for (const name of labelsToApply) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color: name.startsWith("city:") ? "c2e0c6" : "bfd4f2",
+                });
+                console.log(`Created new label: ${name}`);
+              } catch (err) {
+                if (err.status !== 422) throw err; // 422 = label already exists, fine
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: labelsToApply,
+            });
+            console.log(`Applied labels: ${labelsToApply.join(", ")}`);

@@ -1,0 +1,45 @@
+name: Data issue report
+description: Something Chalked shows is wrong — a status, schedule, or zone that doesn't match reality (or the posted sign).
+title: "[data-issue] "
+labels: ["data-issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for flagging this. Every "wrong here" report makes Chalked's data more trustworthy, and — per SPEC.md's framing — a visible backlog of these across cities is itself evidence for why a real national curb-data standard is overdue.
+
+        This label family (`data-issue`, plus `city:*`/`category:*` added during triage) is kept separate from the `epic`/`ready`/`blocked` planning labels used elsewhere in this repo, so data-quality reports don't get lost in build-planning noise.
+
+        If this is about a rule with **no posted sign at all** (a citywide code-only rule, like the Walnut, CA case in `research/municipal-code-hosting.md`), use the **Unsigned rule report** template instead — this one.
+  - type: input
+    id: jurisdiction
+    attributes:
+      label: Jurisdiction
+      description: City/county this report is about.
+      placeholder: "Los Angeles, CA"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - sweeping
+        - meters
+        - permits
+        - crime
+        - other/not sure
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What did you observe?
+      description: What Chalked showed, what the posted sign (or reality) actually says, and the location (address, cross streets, or lat/lng).
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Photo or link (optional)
+      description: A photo of the sign, or a link to an official source, if you have one. You can drag-and-drop an image into this box once the issue is created — GitHub hosts it inline.

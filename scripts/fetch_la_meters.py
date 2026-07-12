@@ -62,6 +62,9 @@ def transform(records, synced_at):
                     "rate": r.get("raterange"),
                     "time_limit": r.get("timelimit"),
                     "schedule": None,  # honestly absent from the source -- see module docstring
+                    # data_as_of == last_synced: LADOT's own inventory is the live source of
+                    # truth here, no separate vintage to track -- see schema/common-schema.md.
+                    "data_as_of": synced_at,
                     "source": {
                         "name": "LADOT Metered Parking Inventory & Policies",
                         "url": SOURCE_URL,

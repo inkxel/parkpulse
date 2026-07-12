@@ -69,7 +69,7 @@ Not on the original 5-city list, but the scan found **a real, confirmed open dat
 
 ## Next steps this scan points to
 
-- Investigate ParkUsher directly (architecture, open-source status, data sourcing) — the same treatment CURB and sweep.la got.
-- Consider San Diego as an addition to the first-adapter candidate set, given its confirmed real open dataset.
-- When building the common schema, don't assume sweeping is always the primary category — regional variation (Sunbelt vs. coastal) means the schema needs to represent "this category doesn't meaningfully exist here" cleanly, not just "no data yet."
+- [x] ~~Investigate ParkUsher directly (architecture, open-source status, data sourcing) — the same treatment CURB and sweep.la got.~~ — done, see [parkusher.md](parkusher.md): not open source, no confirmed open-data pipeline, meters paywalled, coverage uneven across its 7 cities (incl. Seattle and SF) — doesn't change Chalked's prioritization.
+- [x] ~~Consider San Diego as an addition to the first-adapter candidate set, given its confirmed real open dataset.~~ — done, see [cities/san-diego.md](cities/san-diego.md): added to SPEC.md's ranked candidate list (~4th, provisionally) — strong meters, unfinished sweeping trace, likely-gapped permits.
+- [x] ~~When building the common schema, don't assume sweeping is always the primary category...~~ — done, see [schema/common-schema.md](../schema/common-schema.md): `not_applicable` and `unconfirmed` are two of its six explicit per-category statuses, specifically for this distinction.
 - A vendor-adapter layer (matching a city to its meter payment vendor) could cover most scanned cities with only a handful of vendor integrations — worth weighing against building purely per-city adapters.

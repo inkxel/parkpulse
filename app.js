@@ -91,6 +91,20 @@ if (DEBUG_TIME) {
   document.body.insertBefore(banner, document.body.firstChild);
 }
 
+// First-run disclaimer notice (SPEC.md "Trust, error reporting & disclaimer") -- shown once
+// per browser via localStorage, not once per page load, so it's a real deliberate read
+// rather than a modal muscle-memory dismisses without looking. The persistent footer strip
+// in index.html stays too, for anyone who wants to re-check it later without clearing storage.
+const DISCLAIMER_ACK_KEY = "chalked_disclaimer_ack_v1";
+const disclaimerOverlay = document.getElementById("disclaimer-modal-overlay");
+if (localStorage.getItem(DISCLAIMER_ACK_KEY)) {
+  disclaimerOverlay.classList.add("hidden");
+}
+document.getElementById("disclaimer-ack-btn").addEventListener("click", () => {
+  localStorage.setItem(DISCLAIMER_ACK_KEY, "1");
+  disclaimerOverlay.classList.add("hidden");
+});
+
 const map = L.map("map").setView([34.0522, -118.2437], 11);
 // Exposed for QA/testing (e.g. Playwright driving the map programmatically).
 // Gotcha worth remembering: map.latLngToContainerPoint() returns coordinates relative to
@@ -109,12 +123,51 @@ const statusPanel = document.getElementById("status-panel");
 let sweepingData = null;
 let geoLayer = null;
 
+// Per-category confidence/staleness badge -- SPEC.md's "Trust, error reporting &
+// disclaimer" section: the data_as_of timestamp (schema/common-schema.md) needs to be a
+// visible signal in the UI, not just a schema field nobody sees. Silent staleness reads as
+// confident when it isn't, which is worse than showing no data at all -- LA's permits (2015)
+// is the concrete case that forced this, but the badge is shared across all three
+// categories so a future stale sweeping/meters source gets the same honest treatment
+// automatically, not a bespoke one-off like the old permits-only text did.
+const STALE_THRESHOLD_DAYS = 180;
+
+function confidenceBadge(dataAsOf) {
+  if (!dataAsOf) return `<span style="color:#888">Data vintage unknown.</span>`;
+  const asOfDate = new Date(dataAsOf);
+  const ageDays = (getNow() - asOfDate) / 86400000;
+  const label = asOfDate.toLocaleDateString();
+  if (ageDays > STALE_THRESHOLD_DAYS) {
+    return `<strong style="color:#c62828">Data as of ${label} — may be outdated.</strong>`;
+  }
+  return `<span style="color:#2e7d32">Data current as of ${label}.</span>`;
+}
+
+// Builds a prefilled GitHub issue-creation link rather than posting anything ourselves --
+// see schema/error-report-pipeline.md for why (no backend, no anonymous auto-post; a real
+// GitHub account to submit through IS the anti-spam/moderation step, not a placeholder for
+// one). GitHub's issue forms prefill fields whose id matches a query param name.
+function reportIssueUrl(category, jurisdictionLabel) {
+  const params = new URLSearchParams({
+    template: "data-issue.yml",
+    title: `[data-issue] ${category} — ${jurisdictionLabel}`,
+    jurisdiction: jurisdictionLabel,
+    category,
+  });
+  return `https://github.com/inkxel/chalked/issues/new?${params.toString()}`;
+}
+
+function reportLink(category, jurisdictionLabel) {
+  return `<a href="${reportIssueUrl(category, jurisdictionLabel)}" target="_blank" rel="noopener">Report a problem →</a>`;
+}
+
 function renderPanel(zone, status) {
   statusPanel.innerHTML =
     `<span class="dot ${status.level}"></span>` +
     `<strong>${zone.route_id}</strong> (${zone.maintenance_district_name}) — ${zone.day_of_week}s, ` +
     `${zone.start_time}–${zone.end_time}, weeks ${zone.weeks_of_month.join(" & ")}, ` +
-    `${zone.side_of_street} side. ${status.label}`;
+    `${zone.side_of_street} side. ${status.label} ${confidenceBadge(zone.data_as_of)} ` +
+    reportLink("sweeping", "Los Angeles, CA");
 }
 
 // Meters aren't a restriction with a status level -- they're a cost fact (SPEC.md's
@@ -124,23 +177,25 @@ function renderMeterPanel(meter) {
   statusPanel.innerHTML =
     `<span class="dot blue"></span>` +
     `<strong>Meter ${meter.space_id}</strong> — ${meter.blockface}. ` +
-    `${meter.rate_type} rate ${meter.rate}, ${meter.time_limit} limit. ` +
+    `${meter.rate_type} rate ${meter.rate}, ${meter.time_limit} limit. ${confidenceBadge(meter.data_as_of)} ` +
     `<em>No operating-hours/schedule data available for LA meters (see research/cities/los-angeles.md) — ` +
-    `check the posted meter sign for when payment is actually required.</em>`;
+    `check the posted meter sign for when payment is actually required.</em> ` +
+    reportLink("meters", "Los Angeles, CA");
 }
 
 // Permits are an eligibility gate, not a timing question (SPEC.md's Visual design section)
 // -- the app can't know if *this user* holds the right permit for *this* district, so it's
-// a flag, not a status level. The 2015 staleness (research/cities/los-angeles.md) is
-// surfaced directly here, not just in docs -- a decade-old boundary shouldn't read with
-// the same confidence as fresh data.
+// a flag, not a status level. The 2015 staleness (research/cities/los-angeles.md) now comes
+// through the shared confidenceBadge() instead of bespoke inline text, same as the other
+// two categories.
 function renderPermitPanel(district) {
   statusPanel.innerHTML =
     `<span class="dot blue"></span>` +
     `<strong>Preferential Parking District ${district.district_number}</strong> ` +
     `(${district.district_name}) — permit required for unrestricted parking here. ` +
-    `<strong style="color:#c62828">Data as of ${district.data_as_of}</strong> — LADOT hasn't ` +
-    `confirmed an update since then, so district boundaries may not reflect changes made after that date.`;
+    `${confidenceBadge(district.data_as_of)} LADOT hasn't confirmed an update since then, so ` +
+    `district boundaries may not reflect changes made after that date. ` +
+    reportLink("permits", "Los Angeles, CA");
 }
 
 function styleFeature(now) {
@@ -164,6 +219,14 @@ function refreshColors() {
 let nationalPlacesData = null;
 let coverageRegistry = null;
 
+// A jurisdiction is "covered" (blue outline) if ANY category is actually built -- see
+// schema/coverage-registry.md. Partial coverage (e.g. a future "Chicago minus meters")
+// still reads as covered at this national zoom level; the per-category gap only becomes
+// visible once you're inside that jurisdiction, which is the intended behavior.
+function isCovered(registryEntry) {
+  return !!registryEntry && Object.values(registryEntry.categories).some((status) => status === "built");
+}
+
 Promise.all([
   fetch("data/national-places.geojson").then((r) => r.json()),
   fetch("data/coverage_registry.json").then((r) => r.json()),
@@ -175,8 +238,7 @@ Promise.all([
     renderer: L.canvas(),
     interactive: false,
     style: (feature) => {
-      const covered = coverageRegistry[feature.properties.place_id];
-      return covered
+      return isCovered(coverageRegistry[feature.properties.place_id])
         ? { color: "#1565c0", weight: 1.5, fillOpacity: 0, opacity: 0.6 }
         : { color: "#555", weight: 0.6, fillColor: "#888", fillOpacity: 0.55, opacity: 0.6 };
     },
@@ -199,8 +261,8 @@ map.on("click", (e) => {
     return;
   }
 
-  const covered = coverageRegistry[place.properties.place_id];
-  if (covered) {
+  const registryEntry = coverageRegistry[place.properties.place_id];
+  if (isCovered(registryEntry)) {
     statusPanel.innerHTML =
       `You're in <strong>${place.properties.name}</strong> — click a colored sweeping/meters/permits zone above for its specific status, ` +
       `or this spot may just not have one nearby.`;

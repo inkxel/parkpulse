@@ -1,0 +1,40 @@
+name: Lint & validate
+
+# Automates the checks this repo has so far been running by hand before every commit
+# (see commit history) -- syntax on the Python adapters and app.js, YAML validity on the
+# issue-form templates and workflows, and the coverage registry against
+# schema/coverage-registry.md via scripts/validate_schema.py. Doesn't touch any external
+# network -- data/*.geojson is gitignored (see data/README.md), so there's nothing
+# adapter-output-shaped to validate in CI itself; scripts/validate_schema.py's geojson mode
+# is for contributors to run locally against their own freshly-fetched output before
+# opening a PR (see CONTRIBUTING.md).
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python syntax check (scripts/*.py)
+        run: python3 -m py_compile scripts/*.py
+
+      - name: Validate coverage_registry.json against schema/coverage-registry.md
+        run: python3 scripts/validate_schema.py registry data/coverage_registry.json
+
+      - name: YAML validity (issue templates + workflows)
+        run: |
+          pip install --quiet pyyaml
+          python3 -c "
+          import glob, yaml
+          for f in glob.glob('.github/ISSUE_TEMPLATE/*.yml') + glob.glob('.github/workflows/*.yml'):
+              yaml.safe_load(open(f))
+              print(f'{f}: OK')
+          "
+
+      - name: JS syntax check (app.js)
+        run: node --check app.js

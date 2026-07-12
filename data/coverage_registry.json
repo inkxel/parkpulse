@@ -2,7 +2,12 @@
   "0644000": {
     "name": "Los Angeles",
     "state": "CA",
-    "status": "supported",
-    "categories": ["sweeping", "meters", "permits"]
+    "population": 3898747,
+    "categories": {
+      "sweeping": "built",
+      "meters": "built",
+      "permits": "built",
+      "crime": "paused"
+    }
   }
 }
